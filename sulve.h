@@ -30,6 +30,6 @@ char const L = 9;
 void _display(_cell[L][L]);
 void _fakegen(_cell[L][L]);
 char _rand(char);
-char _rand() { _rand(10); };
+char _rand() { return _rand(10); };
 
 #endif /* SULVE_H_ */
