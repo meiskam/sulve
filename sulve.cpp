@@ -118,7 +118,10 @@ void _doit(_grid* grid) {
 					forward=0;
 				}
 				else {
-					grid->at(i,j)->set( grid->at(i,j)->avail.front() ); //set the cell value to the first avail, and move on
+					int ran = _rand( grid->at(i,j)->avail.size() );
+					it=grid->at(i,j)->avail.begin();
+					for (int k = 1; k<ran; k++) {it++;}
+					grid->at(i,j)->set(*it); //set the cell value to a random avail, and move on
 					i++;
 					forward=1;
 				}
