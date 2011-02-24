@@ -6,67 +6,133 @@
  *   Copyright: All rights reserved, do not edit, do not redistribute.  Subject to change without notice.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
+#include <cstdlib>
+#include <ctime>
+#include <iostream>
 #include <list>
+#include <vector>
 #include "sulve.h"
+#include "ConsoleColor.h"
+using namespace std;
+
 
 int main( int argc, const char* argv[] )
 {
+	//cout << RAND_MAX << endl;
+
 	srand(time(NULL)); // initiate rand
 
+	_grid* grid = new _grid(9); // must be 9
+
+	//_fakegen(grid);
+	_doit(grid);
+	_display(grid);
+
+	/*
 	_cell grid[L][L];
 	_fakegen(grid);
 	_display(grid);
+	*/
 }
 
-void _display(_cell grid[L][L]) {
+int _rand(int top) {
+	return (rand() % top)+1;
+}
+
+void _fakegen(_grid* grid) {
+	int L = grid->size;
+	for (int j=0; j<L; j++) {
+		for (int i=0; i<L; i++) {
+			grid->at(i,j)->set(_rand());
+			if (_rand(3)==1) {
+				grid->at(i,j)->locked = 1;
+			}
+		}
+	}
+}
+
+void _display(_grid* grid) {
+	int L = grid->size;
+	int m = L/3;
 	system("cls");
-	printf("\n");
-	for (char j=0; j<L; j++) {
-		printf("  ");
-		for (char i=0; i<L; i++) {
-			printf("%i", grid[i][j].value);
-			if (i%3==2) printf("  ");
+	cout << white << endl;
+	for (int j=0; j<L; j++) {
+		cout << "  ";
+		for (int i=0; i<L; i++) {
+			if (grid->at(i,j)->locked) cout << green << grid->at(i,j)->value << white;
+			else cout << grid->at(i,j)->value;
+			if (i%m==m-1) cout << "  ";
 		}
-		printf("\n");
-		if (j%3==2) printf("\n");
+		cout << endl;
+		if (j%m==m-1) cout << endl;
 	}
 
 }
 
-char _rand(char top) {
-	return rand() % top;
-}
-
-void _fakegen(_cell grid[L][L]) {
-	for (char j=0; j<L; j++) {
-		for (char i=0; i<L; i++) {
-			grid[i][j].value = _rand();
-		}
-	}
-}
-
-void _generate(_cell grid[L][L]) {
-	char j=0;
-	char i=0;
+void _doit(_grid* grid) {
+	int j=0;
+	int i=0;
+	int Ri=0;
+	int Rj=0;
+	int L=grid->size;
+	int m = L/3;
+	list<int> temp;
+	list<int>::iterator it;
+	int forward = 1;
 	while (j<L) {
 		i=0;
 		while (i<L) {
-			if (grid[i][j].avail.empty()) {
-				for (int k=0; k<L; k++) grid[i][j].avail.push_back(k);
-				grid[i][j].value = -1;
+			if (grid->at(i,j)->locked) {
+				if (forward) i++;
+				else i--;
 			}
+			else {
+				if (forward) {
+					temp.clear();
+					grid->at(i,j)->avail.clear();
+					for (int k=1; k<=L; k++) grid->at(i,j)->avail.push_back(k);
 
+					Ri = i/m*m; // which region in the i direction
+					Rj = j/m*m; // which region in the j direction
+					int a,b,c;
+					for (int k=0; k<L; k++) {
+					//	grid->at(i,j)->avail.remove()
+						a=grid->at(k,j)->value;
+						b=grid->at(i,k)->value;
+						c=grid->at(Ri+k%m,Rj+k/m)->value;
+						temp.push_back(a); //row
+						temp.push_back(b); //column
+						temp.push_back(c); //region
+					}
+					temp.sort(); //so apparently we have to sort it, before removing dupes
+					temp.unique(); //delete all dupes
+					temp.remove(0);
 
-			if (i<0) { j--; i=L-1; }
-			else { i++; }
+					for (it=temp.begin(); it!=temp.end(); it++)
+						grid->at(i,j)->avail.remove(*it); //remove temps from avail list
+				}
+				if (grid->at(i,j)->avail.size() == 0) { //if none are avail, reset, then go back a cell
+					grid->at(i,j)->value = 0;
+					grid->at(i,j)->avail.empty();
+					i--;
+					forward=0;
+				}
+				else {
+					grid->at(i,j)->set( grid->at(i,j)->avail.front() ); //set the cell value to the first avail, and move on
+					i++;
+					forward=1;
+				}
+			}
+			if (i<0) { j--; i=L-1; } // move up a row, if we need to, while going backwards
+			if (j<0) { cout<<"ERROR: j<0\n"; exit(42); }
 		}
 		j++;
 	}
 }
 
+/*
+
 char* _avail(_cell grid[L][L]) {
 	return 0;
 }
+*/

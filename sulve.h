@@ -10,26 +10,35 @@
 #define SULVE_H_
 
 #include <list>
+using namespace std;
 
 class _cell {
 	public:
-		char value;
-		char locked;
-		std::list<char> failed;
-		std::list<char> avail;
-		_cell() { value = -1; locked = 0; };
-		void set(char a) { value = a; failed.push_back(a); };
-		//_cell(char a, char b) { value = a; locked = b; };
-		//_cell(char a) { _cell(a, 0); };
-		//_cell() { _cell(-1, 0); };
-		//~_cell() { delete failed; };
-
+		int value;
+		int locked;
+		list<int> avail;
+		_cell() { value = 0; locked = 0; };
+		void set(int a) { value = a; avail.remove(a); };
 };
 
-char const L = 9;
-void _display(_cell[L][L]);
-void _fakegen(_cell[L][L]);
-char _rand(char);
-char _rand() { return _rand(10); };
+class _grid {
+	public:
+		int size;
+		vector<vector<_cell> > values;
+		_grid(int a) {
+			size = a;
+			values.resize(size);
+			for (int i=0; i<size; i++) values.at(i).resize(size);
+		}
+		_cell* at(int i, int j) {
+			return &(values.at(i).at(j));
+		}
+};
+
+int _rand(int);
+int _rand() { return _rand(9); };
+void _display(_grid*);
+void _fakegen(_grid*);
+void _doit(_grid*);
 
 #endif /* SULVE_H_ */
