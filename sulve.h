@@ -12,33 +12,33 @@
 #include <list>
 using namespace std;
 
-class _cell {
+class SudokuCell {
 	public:
-		int value;
-		int locked;
-		list<int> avail;
-		_cell() { value = 0; locked = 0; };
-		void set(int a) { value = a; avail.remove(a); };
+		int mValue;
+		int mLocked;
+		list<int> mAvail;
+		SudokuCell() { mValue = 0; mLocked = 0; };
+		void set(int a) { mValue = a; mAvail.remove(a); };
 };
 
-class _grid {
+class SudokuGrid {
 	public:
-		int size;
-		vector<vector<_cell> > values;
-		_grid(int a) {
-			size = a;
-			values.resize(size);
-			for (int i=0; i<size; i++) values.at(i).resize(size);
+		int mSize;
+		vector<vector<SudokuCell> > values;
+		SudokuGrid(int size) {
+			mSize = size;
+			values.resize(mSize);
+			for (int i=0; i<mSize; i++) values.at(i).resize(mSize);
 		}
-		_cell* at(int i, int j) {
+		SudokuCell* at(int i, int j) {
 			return &(values.at(i).at(j));
 		}
 };
 
 int _rand(int);
 int _rand() { return _rand(9); };
-void _display(_grid*);
-void _fakegen(_grid*);
-void _doit(_grid*);
+void _display(SudokuGrid*);
+void _fakegen(SudokuGrid*);
+void _doit(SudokuGrid*);
 
 #endif /* SULVE_H_ */
